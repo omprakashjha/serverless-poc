@@ -1,0 +1,41 @@
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+buildscript {
+  repositories {
+      mavenCentral()
+  }
+  dependencies {
+      classpath "io.spring.gradle:dependency-management-plugin:1.0.3.RELEASE"
+  }
+}
+
+apply plugin: "io.spring.dependency-management"
+
+dependencyManagement {
+  imports {
+      mavenBom 'software.amazon.awssdk:bom:2.0.0'
+  }
+}
+
+dependencies {
+    compile (
+        'com.amazonaws:aws-lambda-java-core:1.1.0',
+        'com.amazonaws:aws-lambda-java-events:2.2.4',
+        'com.amazonaws:aws-java-sdk-sqs:1.11.470',
+        'com.amazonaws:aws-java-sdk-s3:1.11.163'
+    )
+}
+
+task buildZip(type: Zip) {
+    from compileJava
+    from processResources              
+    into('lib') {
+        from configurations.compileClasspath
+    }           
+}
+
+build.dependsOn buildZip
